@@ -37,11 +37,14 @@ export function GiftingHints({ active = true, onStart }: { active?: boolean; onS
   }, [])
 
   const playing = active && inView && !reduce
+  // Once the video actually starts, fade the still out. Until then the still
+  // sits on top of the video, hiding Safari's native tap-to-play overlay
+  // when autoplay is blocked (user preferences, Low Power Mode, etc.).
+  const [hasPlayed, setHasPlayed] = useState(false)
 
   // Safari's autoplay heuristic checks the HTML `muted` attribute, not the
   // JS property — React's `muted` prop sets the property but doesn't always
-  // emit the attribute at parse time, so Safari paints its tap-to-play
-  // overlay. Force the attribute (and defaultMuted) before anyone calls play.
+  // emit the attribute at parse time. Force the attributes directly.
   useLayoutEffect(() => {
     const v = video.current
     if (!v) return
@@ -59,10 +62,18 @@ export function GiftingHints({ active = true, onStart }: { active?: boolean; onS
     else v.pause()
   }, [playing])
 
+  const handleActivate = () => {
+    // Kick the video on any user interaction — handles the case where Safari
+    // blocked initial autoplay and only a user gesture can start it.
+    const v = video.current
+    if (v && v.paused) void v.play().catch(() => {})
+    onStart?.()
+  }
+
   const activate = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault()
-      onStart?.()
+      handleActivate()
     }
   }
 
@@ -72,7 +83,7 @@ export function GiftingHints({ active = true, onStart }: { active?: boolean; onS
         ref={root}
         role="button"
         tabIndex={0}
-        onClick={onStart}
+        onClick={handleActivate}
         onKeyDown={activate}
         whileTap={{ scale: 0.98 }}
         transition={{ type: 'spring', stiffness: 520, damping: 32 }}
@@ -81,8 +92,8 @@ export function GiftingHints({ active = true, onStart }: { active?: boolean; onS
         className="block w-full cursor-pointer overflow-hidden rounded-[12px] text-left"
       >
         <span
-          className="relative block aspect-[370/150] w-full bg-cover bg-center"
-          style={{ backgroundImage: `url(${still})`, backgroundColor: '#e43a7b' }}
+          className="relative block aspect-[370/150] w-full"
+          style={{ backgroundColor: '#e43a7b' }}
         >
           <video
             ref={video}
@@ -95,9 +106,8 @@ export function GiftingHints({ active = true, onStart }: { active?: boolean; onS
             controls={false}
             disablePictureInPicture
             aria-hidden
-            // Pointer events off so the parent div owns the tap and the native
-            // tap-to-play overlay never has a chance to intercept.
             className="pointer-events-none absolute inset-0 size-full select-none object-cover"
+            onPlaying={() => setHasPlayed(true)}
             onLoadedMetadata={(e) => void e.currentTarget.play().catch(() => {})}
             onCanPlay={(e) => void e.currentTarget.play().catch(() => {})}
           >
@@ -108,6 +118,16 @@ export function GiftingHints({ active = true, onStart }: { active?: boolean; onS
             <source src={loopMp4} type="video/mp4" />
             <source src={loopWebm} type="video/webm" />
           </video>
+          {/* Still sits ABOVE the video and fades out once playback starts.
+              Covers Safari's native tap-to-play overlay when autoplay is
+              blocked, so the user sees the poster instead of a play button. */}
+          <img
+            src={still}
+            alt=""
+            aria-hidden
+            draggable={false}
+            className={`pointer-events-none absolute inset-0 size-full select-none object-cover transition-opacity duration-300 ${hasPlayed ? 'opacity-0' : 'opacity-100'}`}
+          />
         </span>
         <span className="flex h-[38px] items-center gap-[10px] bg-pink-tint px-3" data-anno="gifting-hints-cta">
           <Rule cap="left" />
