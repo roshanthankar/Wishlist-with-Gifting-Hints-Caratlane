@@ -1,0 +1,249 @@
+@import "tailwindcss";
+@import "@fontsource/dm-serif-text/400.css";
+@import "@fontsource/dm-serif-text/400-italic.css";
+
+/* ------------------------------------------------------------------
+   Design tokens — mirrored 1:1 from the Figma DS board
+   (“DS · Gifting components and tokens”, node 834:78991).
+   Colour rule: pink = from Rahul (gifts), violet = from Priya (hints),
+   green = CaratLane offers only.
+   ------------------------------------------------------------------ */
+@theme {
+  --font-sans: "Proxima Nova Figma", "proxima-nova", "Proxima Nova", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-serif: "DM Serif Text", Georgia, "Times New Roman", serif;
+  --font-sf: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro", system-ui, "Segoe UI", Roboto, sans-serif;
+
+  --color-pink: #dd1564;
+  --color-pink-tint: #ffe1ed;
+  --color-violet: #5a39e3;
+  --color-violet-tint: #f0ecff;
+  --color-violet-stroke: #d7cdff;
+  --color-ink: #000000;
+  --color-ink-2: #1a1a1a;
+  --color-ink-3: #3e3e3e;
+  --color-muted: #767676;
+  --color-muted-2: #6b6b6b;
+  --color-offer: #288600;
+  --color-orange: #b85200;
+  --color-canvas: #fdfdfd;
+  --color-field: #fafafa;
+  --color-line: #f0f0f0;
+  --color-line-2: #e0e0e0;
+  --color-line-3: #ececef;
+  --color-glass: #f1f1f1;
+  --color-whatsapp: #00b845;
+
+  --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Each glass surface’s own refraction filter (src/ui/liquidGlass.ts); never inherited by nested glass. */
+@property --lens {
+  syntax: '*';
+  inherits: false;
+}
+:root.has-lens {
+  --glass-control-blur: 3px;
+}
+
+/* Proxima Nova stylistic sets used everywhere in Figma
+   (single-storey a, alternate l and y). */
+:root {
+  --pn-features: "salt" 1, "ss01" 1, "ss02" 1, "ss03" 1, "ss04" 1, "ss06" 1, "ss07" 1;
+  /* Overridden per environment (iPhone mockup vs. real device) by <ProtoEnv> */
+  --safe-top: 62px;
+  --safe-bottom: 34px;
+  /* Liquid Glass rim (iOS 26/27): the lens edge catches the light top-left
+     and, more softly, bottom-right, with a faint bright ring all round. */
+  --glass-rim:
+    inset 1px 2px 1px -1px rgba(255, 255, 255, 0.95),
+    inset -1px -2px 1px -1px rgba(255, 255, 255, 0.75),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.28);
+  /* Frost: blurred, but more saturated and a touch brighter, so colour behind glows through instead of greying. */
+  --glass-frost: blur(20px) saturate(1.9) brightness(1.05);
+  /* Controls are near-clear glass where the refracting lens exists (Chromium), frosted elsewhere. */
+  --glass-control-blur: 14px;
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  body {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-feature-settings: var(--pn-features);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: var(--color-ink);
+    background: #f2f2f4;
+    overscroll-behavior: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  button {
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+  img {
+    -webkit-user-drag: none;
+    user-select: none;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  /* Everything inside the phone behaves like a native app */
+  .app-surface {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
+  .app-surface input,
+  .app-surface textarea {
+    user-select: text;
+    -webkit-user-select: text;
+  }
+  .serif {
+    font-family: var(--font-serif);
+    font-feature-settings: normal;
+  }
+  .sf {
+    font-family: var(--font-sf);
+    font-feature-settings: normal;
+  }
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* No focus rings or focus styles anywhere (prototype presentation) */
+*:focus,
+*:focus-visible,
+*:focus-within {
+  outline: none !important;
+}
+input,
+textarea {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ------------------------------------------------------------------
+   iOS 27 “Liquid Glass” surfaces. Fills and kit rims come from the Figma
+   renders; the Glass effect itself (frost, specular rim, lens glow) is
+   rebuilt for the web. Glass edges get lighter, never darker.
+   ------------------------------------------------------------------ */
+@utility glass {
+  /* Controls (round buttons, Safari bar, pills). Sampled from the Figma renders:
+     #F0F0F0 at the top → #F8F8F8 at the bottom on white, translucent over colour. */
+  background: linear-gradient(180deg, rgba(222, 222, 226, 0.5) 0%, rgba(244, 244, 246, 0.5) 100%);
+  -webkit-backdrop-filter: blur(var(--glass-control-blur)) saturate(1.8) brightness(1.03);
+  backdrop-filter: var(--lens,) blur(var(--glass-control-blur)) saturate(1.8) brightness(1.03);
+  box-shadow:
+    var(--glass-rim),
+    inset 0 0 8px rgba(255, 255, 255, 0.45),
+    1.25px 0 0 -0.75px #d0d0d0,
+    -1.25px 0 0 -0.75px #d0d0d0,
+    0 0 0 0.5px rgba(0, 0, 0, 0.09),
+    0 4px 14px rgba(0, 0, 0, 0.06);
+  /* Pressed: the button lifts into a clear lens (see GlassCircle), like the iOS segmented thumb. */
+  &:active {
+    background: rgba(250, 250, 252, 0.1);
+    --glass-control-blur: 0px;
+  }
+}
+@utility glass-panel {
+  /* Floating panels (context menu, toast): Figma “Liquid Glass - Regular - Medium”,
+     white 70% lighten + #BFBFBF 10%, glass radius 16, drop shadow 0 8 48 / 25%.
+     The kit’s dark inner shadows are left out: on the web they read as grey bands. */
+  background: var(--glass-tint, rgba(246, 246, 248, 0.64));
+  -webkit-backdrop-filter: var(--glass-frost);
+  backdrop-filter: var(--glass-frost) var(--lens,);
+  box-shadow:
+    var(--glass-rim),
+    inset 0 0 18px rgba(255, 255, 255, 0.5),
+    0 0 0 0.5px rgba(0, 0, 0, 0.1),
+    var(--glass-float, 0 8px 48px rgba(0, 0, 0, 0.22));
+}
+@utility glass-chip {
+  /* Small badges over photos: Figma white 40% + background blur, with the lens rim. */
+  background: var(--glass-tint, rgba(255, 255, 255, 0.4));
+  -webkit-backdrop-filter: var(--glass-frost);
+  backdrop-filter: var(--lens,) var(--glass-frost);
+  box-shadow:
+    var(--glass-rim),
+    0 0 0 0.5px rgba(0, 0, 0, 0.08),
+    var(--glass-float, 0 2px 8px rgba(0, 0, 0, 0.05));
+}
+@utility glass-rim {
+  /* The lens rim alone, for flat glass fills (secondary buttons, #F1F1F1). */
+  box-shadow: var(--glass-rim);
+}
+@utility glass-dark {
+  /* Figma B3b: white 12% + 1px white 18% inside stroke + background blur 20, with a specular rim. */
+  background: rgba(255, 255, 255, 0.12);
+  -webkit-backdrop-filter: blur(10px) saturate(1.6);
+  backdrop-filter: var(--lens,) blur(var(--glass-control-blur)) saturate(1.6);
+  box-shadow:
+    inset 1px 2px 1px -1px rgba(255, 255, 255, 0.55),
+    inset -1px -2px 1px -1px rgba(255, 255, 255, 0.3),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+    inset 0 0 12px rgba(255, 255, 255, 0.07);
+  &:active {
+    background: rgba(255, 255, 255, 0.04);
+    --glass-control-blur: 0px;
+  }
+}
+/* Prominent (tinted) glass button: violet / pink / WhatsApp green.
+   Figma: slightly darker at the top, lighter towards the bottom, light rims. */
+@utility glass-tint {
+  background-image: linear-gradient(180deg, rgba(0, 0, 0, 0.07) 0%, rgba(0, 0, 0, 0) 45%, rgba(255, 255, 255, 0.1) 100%);
+  box-shadow:
+    inset 1px 2px 1px -1px rgba(255, 255, 255, 0.45),
+    inset -1px -2px 1px -1px rgba(255, 255, 255, 0.3),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.14),
+    1.25px 0 0 -0.75px #e6e6e6,
+    -1.25px 0 0 -0.75px #e6e6e6,
+    0 8px 15px rgba(0, 0, 0, 0.02);
+}
+
+/* OpenType features per Figma text. Every Proxima Nova run uses --pn-features
+   (standard ligatures stay on, as in Figma). Button labels (“Button - Liquid
+   Glass - Text”) add SS16; the iOS long-press menu rows turn ligatures off. */
+@utility pn-button-text {
+  font-feature-settings: var(--pn-features), "ss16" 1;
+}
+@utility pn-no-liga {
+  font-feature-settings: var(--pn-features), "liga" 0, "clig" 0;
+}
+
+/* Browsers without @font-face metric overrides (see src/proto/fonts.ts):
+   keep Figma’s 1.0 “Auto” line height for Proxima Nova text. */
+.no-font-metrics .leading-\[normal\]:not(.serif) {
+  line-height: 1;
+}

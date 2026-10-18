@@ -1,0 +1,85 @@
+/* Gifting Hints banner, version 2 (src/screens/pdp/GiftingHintsStage.tsx) */
+@keyframes gh-marquee { to { transform: translateX(-25%); } }
+@keyframes gh-marquee-r { from { transform: translateX(-25%); } to { transform: translateX(0); } }
+@keyframes gh-spin { to { transform: rotate(360deg); } }
+@keyframes gh-shine { 0% { background-position: 100% 0; } 55%, 100% { background-position: 0% 0; } }
+@keyframes gh-twinkle {
+  0%, 100% { opacity: 0; transform: scale(0.4) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1) rotate(45deg); }
+}
+.gh-marquee { animation: gh-marquee 11s linear infinite; }
+.gh-marquee-r { animation-name: gh-marquee-r; animation-duration: 13s; }
+.gh-rays { animation: gh-spin 16s linear infinite; }
+.gh-shine {
+  background: linear-gradient(105deg, #ffc24d 0%, #ffe08a 36%, #fffbea 47%, #ffe08a 58%, #ffc24d 100%);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: gh-shine 3.4s ease-in-out infinite;
+}
+.gh-twinkle { opacity: 0; animation: gh-twinkle 2.6s ease-in-out infinite; }
+.gh-paused, .gh-paused * { animation-play-state: paused !important; }
+
+/* Gifting Hints banner, version 3 (src/screens/pdp/GiftingHintsLuxe.tsx) */
+@property --lux-a {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+@keyframes lux-orbit { to { --lux-a: 360deg; } }
+@keyframes lux-foil { 0% { background-position: 100% 0; } 60%, 100% { background-position: 0% 0; } }
+@keyframes lux-drift { 0% { transform: translate(0, 0); } 100% { transform: translate(26px, 14px); } }
+@keyframes lux-drift-b { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(-22px, -10px) scale(1.08); } }
+@keyframes lux-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+@keyframes lux-rise {
+  0% { opacity: 0; transform: translateY(0) scale(0.4) rotate(0deg); }
+  25% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-46px) scale(1) rotate(90deg); }
+}
+@keyframes lux-glint { 0% { background-position: 160% 0; } 100% { background-position: -60% 0; } }
+@keyframes lux-sheen { 0%, 70% { transform: translateX(-120%); } 100% { transform: translateX(220%); } }
+.lux-frame {
+  padding: 1px;
+  background: conic-gradient(from var(--lux-a), rgba(255, 236, 190, 0) 0deg, rgba(255, 236, 190, 0) 250deg, rgba(255, 242, 207, 0.95) 320deg, rgba(255, 236, 190, 0) 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  animation: lux-orbit 7s linear infinite;
+}
+.lux-foil {
+  background: linear-gradient(100deg, #b8862e 0%, #e8c27a 28%, #fff3d1 44%, #f6dfa0 54%, #c99a45 74%, #b8862e 100%);
+  background-size: 260% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  padding-right: 4px; /* italic overhang */
+  filter: drop-shadow(0 1px 0 rgba(10, 2, 20, 0.35));
+  animation: lux-foil 6s ease-in-out infinite;
+}
+.lux-drift { animation: lux-drift 13s ease-in-out infinite alternate; }
+.lux-drift-b { animation: lux-drift-b 11s ease-in-out infinite alternate; }
+.lux-float { animation: lux-float 4.8s ease-in-out infinite; }
+.lux-dust { opacity: 0; animation: lux-rise 3.4s ease-out infinite; }
+.lux-glint {
+  background: linear-gradient(105deg, rgba(255, 255, 255, 0) 35%, rgba(255, 255, 255, 0.85) 50%, rgba(255, 255, 255, 0) 65%);
+  background-size: 260% 100%;
+  animation: lux-glint 1.2s 0.5s ease-in-out both;
+}
+.lux-cta::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  background: linear-gradient(105deg, rgba(255, 240, 200, 0), rgba(255, 240, 200, 0.35), rgba(255, 240, 200, 0));
+  animation: lux-sheen 6s ease-in-out infinite;
+}
+@keyframes lux-heart {
+  0% { opacity: 0; transform: translateY(-16px) scale(0.8) rotate(-10deg); }
+  30% { opacity: 1; transform: translateY(8px) scale(1) rotate(0deg); }
+  75% { opacity: 1; transform: translateY(34px) scale(0.92); }
+  100% { opacity: 0; transform: translateY(46px) scale(0.8); }
+}
+.lux-heart { opacity: 0; animation: lux-heart 2.4s 0.35s ease-in-out both; }
+.lux-paused, .lux-paused * { animation-play-state: paused !important; }
+
