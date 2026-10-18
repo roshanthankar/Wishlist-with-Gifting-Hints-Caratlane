@@ -18,12 +18,17 @@ export function GiftingHints({ active = true, onStart }: { active?: boolean; onS
   const reduce = useReducedMotion()
   const root = useRef<HTMLButtonElement>(null)
   const video = useRef<HTMLVideoElement>(null)
-  const [inView, setInView] = useState(false)
+  // Optimistic: assume in view so autoplay fires immediately on mount;
+  // the observer only matters when the user scrolls away (battery save).
+  const [inView, setInView] = useState(true)
 
   useEffect(() => {
     const el = root.current
-    if (!el || typeof IntersectionObserver === 'undefined') return setInView(true)
-    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), { threshold: 0.15 })
+    if (!el || typeof IntersectionObserver === 'undefined') return
+    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), {
+      threshold: 0,
+      rootMargin: '200px 0px',
+    })
     io.observe(el)
     return () => io.disconnect()
   }, [])
@@ -56,10 +61,11 @@ export function GiftingHints({ active = true, onStart }: { active?: boolean; onS
           <video
             ref={video}
             poster={still}
+            autoPlay
             muted
             loop
             playsInline
-            preload="metadata"
+            preload="auto"
             disablePictureInPicture
             aria-hidden
             className="absolute inset-0 size-full select-none object-cover"
