@@ -37,10 +37,11 @@ export function GiftingHints({ active = true, onStart }: { active?: boolean; onS
   }, [])
 
   const playing = active && inView && !reduce
-  // Once the video actually starts, fade the still out. Until then the still
-  // sits on top of the video, hiding Safari's native tap-to-play overlay
-  // when autoplay is blocked (user preferences, Low Power Mode, etc.).
-  const [hasPlayed, setHasPlayed] = useState(false)
+  // Track whether the <video> is actually playing right now. When it isn't,
+  // we hide the whole video element — this also hides Safari's native
+  // tap-to-play overlay (which lives inside the <video>'s shadow DOM and
+  // paints above sibling elements, so an on-top still image doesn't help).
+  const [isPlayingNow, setIsPlayingNow] = useState(false)
 
   // Safari's autoplay heuristic checks the HTML `muted` attribute, not the
   // JS property — React's `muted` prop sets the property but doesn't always
@@ -92,8 +93,8 @@ export function GiftingHints({ active = true, onStart }: { active?: boolean; onS
         className="block w-full cursor-pointer overflow-hidden rounded-[12px] text-left"
       >
         <span
-          className="relative block aspect-[370/150] w-full"
-          style={{ backgroundColor: '#e43a7b' }}
+          className="relative block aspect-[370/150] w-full bg-cover bg-center"
+          style={{ backgroundImage: `url(${still})`, backgroundColor: '#e43a7b' }}
         >
           <video
             ref={video}
@@ -106,8 +107,12 @@ export function GiftingHints({ active = true, onStart }: { active?: boolean; onS
             controls={false}
             disablePictureInPicture
             aria-hidden
-            className="pointer-events-none absolute inset-0 size-full select-none object-cover"
-            onPlaying={() => setHasPlayed(true)}
+            // opacity 0 when paused/blocked hides Safari's tap-to-play overlay;
+            // the parent's background still image is what the user sees.
+            className={`pointer-events-none absolute inset-0 size-full select-none object-cover transition-opacity duration-300 ${isPlayingNow ? 'opacity-100' : 'opacity-0'}`}
+            onPlaying={() => setIsPlayingNow(true)}
+            onPause={() => setIsPlayingNow(false)}
+            onEnded={() => setIsPlayingNow(false)}
             onLoadedMetadata={(e) => void e.currentTarget.play().catch(() => {})}
             onCanPlay={(e) => void e.currentTarget.play().catch(() => {})}
           >
@@ -118,16 +123,6 @@ export function GiftingHints({ active = true, onStart }: { active?: boolean; onS
             <source src={loopMp4} type="video/mp4" />
             <source src={loopWebm} type="video/webm" />
           </video>
-          {/* Still sits ABOVE the video and fades out once playback starts.
-              Covers Safari's native tap-to-play overlay when autoplay is
-              blocked, so the user sees the poster instead of a play button. */}
-          <img
-            src={still}
-            alt=""
-            aria-hidden
-            draggable={false}
-            className={`pointer-events-none absolute inset-0 size-full select-none object-cover transition-opacity duration-300 ${hasPlayed ? 'opacity-0' : 'opacity-100'}`}
-          />
         </span>
         <span className="flex h-[38px] items-center gap-[10px] bg-pink-tint px-3" data-anno="gifting-hints-cta">
           <Rule cap="left" />
