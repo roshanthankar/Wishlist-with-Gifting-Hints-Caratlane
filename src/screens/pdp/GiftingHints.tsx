@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type KeyboardEvent } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
 import still from '@/assets/pdp/gifting-hints-still.webp'
 import loopWebm from '@/assets/pdp/gifting-hints.webm'
@@ -37,6 +37,20 @@ export function GiftingHints({ active = true, onStart }: { active?: boolean; onS
   }, [])
 
   const playing = active && inView && !reduce
+
+  // Safari's autoplay heuristic checks the HTML `muted` attribute, not the
+  // JS property — React's `muted` prop sets the property but doesn't always
+  // emit the attribute at parse time, so Safari paints its tap-to-play
+  // overlay. Force the attribute (and defaultMuted) before anyone calls play.
+  useLayoutEffect(() => {
+    const v = video.current
+    if (!v) return
+    v.muted = true
+    v.defaultMuted = true
+    v.setAttribute('muted', '')
+    v.setAttribute('playsinline', '')
+    v.setAttribute('webkit-playsinline', '')
+  }, [])
 
   useEffect(() => {
     const v = video.current
@@ -78,11 +92,13 @@ export function GiftingHints({ active = true, onStart }: { active?: boolean; onS
             loop
             playsInline
             preload="auto"
+            controls={false}
             disablePictureInPicture
             aria-hidden
             // Pointer events off so the parent div owns the tap and the native
             // tap-to-play overlay never has a chance to intercept.
             className="pointer-events-none absolute inset-0 size-full select-none object-cover"
+            onLoadedMetadata={(e) => void e.currentTarget.play().catch(() => {})}
             onCanPlay={(e) => void e.currentTarget.play().catch(() => {})}
           >
             {/* H.264 first — hardware-decoded on every iOS device; VP9 is only
