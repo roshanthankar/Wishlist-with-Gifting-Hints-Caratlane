@@ -1,24 +1,23 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
-import loop from '@/assets/pdp/gifting-hints.webp'
 import still from '@/assets/pdp/gifting-hints-still.webp'
+import loopWebm from '@/assets/pdp/gifting-hints.webm'
+import loopMp4 from '@/assets/pdp/gifting-hints.mp4'
+import loopWebmMobile from '@/assets/pdp/gifting-hints-mobile.webm'
+import loopMp4Mobile from '@/assets/pdp/gifting-hints-mobile.mp4'
 
 /**
  * “Gifting Hints banner” (Figma component in “A1 · Gifting Hints banner
- * (motion)”), where “Gifting-ready” used to sit. The pink stage is the Figma
- * Motion animation itself, exported from Figma at 4× and played as an animated
- * WebP at 3× (1110 × 450, 30 fps, 8 s loop), pixel for pixel on an iPhone:
- * the title punches in over a sunburst with confetti, then the three steps
- * play, one pink frosted-glass icon each: save it for them (heart), they drop
- * a hint (sealed envelope), gift it right (gift box). The
- * footer is the call to action; the whole banner is tappable.
- *
- * The settled still stands in for reduced motion, while a sheet covers the
- * page, and off screen (the WebP only decodes while it can be seen).
+ * (motion)”). The pink stage is the Figma Motion animation itself, exported
+ * from Figma at 4× and encoded as H.264 / VP9 video (1110 × 450 desktop,
+ * 720 × 292 mobile, 30 fps, 8 s loop) so mobile browsers get hardware
+ * decoding — animated WebP was CPU-decoded and janked on phones.
+ * The still is the poster for reduced motion, slow networks, and off-screen.
  */
 export function GiftingHints({ active = true, onStart }: { active?: boolean; onStart?: () => void }) {
   const reduce = useReducedMotion()
   const root = useRef<HTMLButtonElement>(null)
+  const video = useRef<HTMLVideoElement>(null)
   const [inView, setInView] = useState(false)
 
   useEffect(() => {
@@ -30,6 +29,13 @@ export function GiftingHints({ active = true, onStart }: { active?: boolean; onS
   }, [])
 
   const playing = active && inView && !reduce
+
+  useEffect(() => {
+    const v = video.current
+    if (!v) return
+    if (playing) void v.play().catch(() => {})
+    else v.pause()
+  }, [playing])
 
   return (
     <div className="px-4">
@@ -47,13 +53,22 @@ export function GiftingHints({ active = true, onStart }: { active?: boolean; onS
           className="relative block aspect-[370/150] w-full bg-cover bg-center"
           style={{ backgroundImage: `url(${still})`, backgroundColor: '#e43a7b' }}
         >
-          <img
-            src={playing ? loop : still}
-            alt=""
-            draggable={false}
-            decoding="async"
+          <video
+            ref={video}
+            poster={still}
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            disablePictureInPicture
+            aria-hidden
             className="absolute inset-0 size-full select-none object-cover"
-          />
+          >
+            <source media="(max-width: 640px)" src={loopWebmMobile} type="video/webm" />
+            <source media="(max-width: 640px)" src={loopMp4Mobile} type="video/mp4" />
+            <source src={loopWebm} type="video/webm" />
+            <source src={loopMp4} type="video/mp4" />
+          </video>
         </span>
         <span className="flex h-[38px] items-center gap-[10px] bg-pink-tint px-3" data-anno="gifting-hints-cta">
           <Rule cap="left" />
