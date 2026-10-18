@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type KeyboardEvent } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
 import still from '@/assets/pdp/gifting-hints-still.webp'
 import loopWebm from '@/assets/pdp/gifting-hints.webm'
@@ -16,7 +16,10 @@ import loopMp4Mobile from '@/assets/pdp/gifting-hints-mobile.mp4'
  */
 export function GiftingHints({ active = true, onStart }: { active?: boolean; onStart?: () => void }) {
   const reduce = useReducedMotion()
-  const root = useRef<HTMLButtonElement>(null)
+  // Interactive wrapper is a div, not a button — <video> inside <button> is
+  // invalid HTML, and iOS Safari paints its own tap-to-play overlay when it
+  // sees the nested interactive content.
+  const root = useRef<HTMLDivElement>(null)
   const video = useRef<HTMLVideoElement>(null)
   // Optimistic: assume in view so autoplay fires immediately on mount;
   // the observer only matters when the user scrolls away (battery save).
@@ -42,17 +45,26 @@ export function GiftingHints({ active = true, onStart }: { active?: boolean; onS
     else v.pause()
   }, [playing])
 
+  const activate = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      onStart?.()
+    }
+  }
+
   return (
     <div className="px-4">
-      <motion.button
+      <motion.div
         ref={root}
-        type="button"
+        role="button"
+        tabIndex={0}
         onClick={onStart}
+        onKeyDown={activate}
         whileTap={{ scale: 0.98 }}
         transition={{ type: 'spring', stiffness: 520, damping: 32 }}
         data-anno="gifting-hints"
         aria-label="Wishlist with Gifting Hints: know they’ll love it. Save it for them, they drop a hint, gift it right. Save it for someone."
-        className="block w-full overflow-hidden rounded-[12px] text-left"
+        className="block w-full cursor-pointer overflow-hidden rounded-[12px] text-left"
       >
         <span
           className="relative block aspect-[370/150] w-full bg-cover bg-center"
@@ -68,12 +80,17 @@ export function GiftingHints({ active = true, onStart }: { active?: boolean; onS
             preload="auto"
             disablePictureInPicture
             aria-hidden
-            className="absolute inset-0 size-full select-none object-cover"
+            // Pointer events off so the parent div owns the tap and the native
+            // tap-to-play overlay never has a chance to intercept.
+            className="pointer-events-none absolute inset-0 size-full select-none object-cover"
+            onCanPlay={(e) => void e.currentTarget.play().catch(() => {})}
           >
-            <source media="(max-width: 640px)" src={loopWebmMobile} type="video/webm" />
+            {/* H.264 first — hardware-decoded on every iOS device; VP9 is only
+                hw-decoded on A12+ and sometimes falls back to CPU. */}
             <source media="(max-width: 640px)" src={loopMp4Mobile} type="video/mp4" />
-            <source src={loopWebm} type="video/webm" />
+            <source media="(max-width: 640px)" src={loopWebmMobile} type="video/webm" />
             <source src={loopMp4} type="video/mp4" />
+            <source src={loopWebm} type="video/webm" />
           </video>
         </span>
         <span className="flex h-[38px] items-center gap-[10px] bg-pink-tint px-3" data-anno="gifting-hints-cta">
@@ -81,7 +98,7 @@ export function GiftingHints({ active = true, onStart }: { active?: boolean; onS
           <span className="pn-button-text whitespace-nowrap text-[13px] font-semibold leading-none text-[#dd1664]">Save it for someone ›</span>
           <Rule cap="right" />
         </span>
-      </motion.button>
+      </motion.div>
     </div>
   )
 }
