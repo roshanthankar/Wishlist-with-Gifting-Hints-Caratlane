@@ -9,9 +9,8 @@ import { useProtoState } from '@/proto/store'
 import { haptic } from '@/proto/haptics'
 import { PRODUCTS, type ProductId } from '@/data/products'
 import {
-  AuraBlob, HeroArt, OccasionPill, PinkPageAura, PrivacyFootnote, SafariBar, Screen, ScrollView, WebHeader, cn, useSafariInset,
+  AuraBlob, OccasionPill, PinkPageAura, PrivacyFootnote, SafariBar, Screen, ScrollView, SendingEnvelope, WebHeader, cn, useSafariInset,
 } from '@/ui'
-import envelopeSent from '@/assets/illustrations/envelope-sent.webp'
 import { VoteTile } from './VoteTile'
 
 export const annotations: FrameAnnotations = {
@@ -311,13 +310,8 @@ function SentState({ pick, size, line }: { pick: ProductId; size: VoteSize; line
       animate={{ opacity: 1 }}
       transition={{ duration: 0.2 }}
     >
-      <motion.div
-        initial={reduce ? { opacity: 0 } : { opacity: 0, y: -24, rotate: -10, scale: 0.8 }}
-        animate={{ opacity: 1, y: 0, rotate: 0, scale: 1 }}
-        transition={{ type: 'spring', stiffness: 260, damping: 18 }}
-      >
-        <HeroArt src={envelopeSent} alt="" imgStyle={{ width: 150 }} />
-      </motion.div>
+      {/* Ananya’s note is written, sealed and sent, on a loop. */}
+      <SendingEnvelope width={150} delay={0.15} />
       <motion.h1 {...rise(0.12)} className="serif mt-5 text-[28px] font-normal leading-[34px] text-pink">
         Sent to Rahul
       </motion.h1>

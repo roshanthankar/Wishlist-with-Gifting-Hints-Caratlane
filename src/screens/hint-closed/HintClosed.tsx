@@ -2,8 +2,7 @@ import { motion } from 'motion/react'
 import { LockSimple } from '@phosphor-icons/react'
 import type { FrameId } from '@/proto/frames'
 import type { FrameAnnotations } from '@/proto/annotations'
-import { Button } from '@/ui'
-import envelopeClosed from '@/assets/illustrations/envelope-closed.webp'
+import { Button, LockedEnvelope } from '@/ui'
 import { HintBackdrop, WebPage } from '../hint-page/HintShell'
 
 /**
@@ -23,21 +22,10 @@ export default function HintClosed({ frame: _frame }: { frame: FrameId }) {
   return (
     <WebPage backdrop={<HintBackdrop variant="compact" />}>
       <div className="flex flex-col items-center gap-[14px] px-4 pt-8">
-        {/* Hero art slot 160×120; envelope-closed FIT in 131×99 at (14.5, 10.5). */}
-        <motion.div
-          data-anno="closed-envelope"
-          className="relative h-[120px] w-[160px]"
-          initial={{ opacity: 0, scale: 0.9, rotate: -4 }}
-          animate={{ opacity: 1, scale: 1, rotate: 0 }}
-          transition={{ type: 'spring', visualDuration: 0.5, bounce: 0.25 }}
-        >
-          <img
-            src={envelopeClosed}
-            alt="A glass envelope with a padlock"
-            draggable={false}
-            className="absolute left-[14.5px] top-[10.5px] h-[99px] w-[131px] select-none object-contain"
-          />
-        </motion.div>
+        {/* Hero art slot 160×120: the padlock drops on and clicks shut, then rattles now and then. */}
+        <div data-anno="closed-envelope" role="img" aria-label="A glass envelope with a padlock" className="relative h-[120px] w-[160px]">
+          <LockedEnvelope width={131} />
+        </div>
 
         <motion.h1 data-anno="closed-title" className="serif w-full text-center text-[28px] leading-[38px] text-violet" {...rise(0)}>
           This hint has closed
@@ -76,7 +64,7 @@ export const annotations: FrameAnnotations = {
     {
       id: 'closed-envelope',
       title: 'The envelope, locked',
-      body: 'The glass envelope from the hint, now with a padlock. The state is clear before a word is read.',
+      body: 'The glass envelope from the hint: a padlock drops on and clicks shut, then rattles now and then as if tried. The state is clear before a word is read.',
     },
     {
       id: 'closed-title',

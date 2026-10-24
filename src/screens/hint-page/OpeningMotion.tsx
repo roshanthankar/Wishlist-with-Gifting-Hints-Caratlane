@@ -11,10 +11,8 @@ import {
   type TargetAndTransition,
   type Transition,
 } from "motion/react";
-import envelopeSealed from "@/assets/illustrations/envelope-sent.webp";
-import envelopeOpened from "@/assets/illustrations/envelope-opened.webp";
-import envelopeHero from "@/assets/illustrations/envelope.webp";
 import { haptic } from "@/proto/haptics";
+import { ENVELOPE_PARTS, OpeningEnvelope } from "@/ui";
 
 /**
  * Opening the hint (Figma M1, 834:45677), the signature moment on C1.
@@ -22,11 +20,13 @@ import { haptic } from "@/proto/haptics";
  *
  *   0 ms          Arrives        the sealed envelope floats up, large, mid-screen;
  *                                the page behind is dimmed and it breathes
- *   1100 ms       Seal pops      bloom, sparks, one soft haptic; the flap opens
- *   1800 ms       Settles        it glides up into the hero slot, the title fades in
- *   2700 ms       Her note       rises and comes into focus
- *   3200 ms       Picks          fan in one by one
- *   ≈ 4.3 s       Open           nothing waits
+ *   1100 ms       Seal pops      bloom, sparks, one soft haptic; it straightens,
+ *                                the flap swings open, the note rises out and a
+ *                                glass heart pops up over it (OpeningEnvelope)
+ *   2400 ms       Settles        it glides up into the hero slot, the title fades in
+ *   3300 ms       Her note       rises and comes into focus
+ *   3800 ms       Picks          fan in one by one
+ *   ≈ 4.9 s       Open           nothing waits
  *
  * A tap anywhere skips to the end. Reduced motion: a 200 ms cross-fade, same
  * content, nothing moves. Plays once per link and device.
@@ -49,10 +49,10 @@ export const reached = (phase: Phase, p: Phase) =>
 /** When each phase starts, in ms after the envelope begins to arrive. */
 const AT: Record<Exclude<Phase, "wait" | "sealed">, number> = {
   pop: 1100,
-  glide: 1800,
-  note: 2700,
-  picks: 3200,
-  done: 4300,
+  glide: 2400,
+  note: 3300,
+  picks: 3800,
+  done: 4900,
 };
 
 const EASE_OUT = [0.22, 1, 0.36, 1] as const;
@@ -62,12 +62,12 @@ const EASE_GLIDE = [0.65, 0, 0.35, 1] as const;
 /* ───────────────────────── Preload ───────────────────────── */
 
 let decoded: Promise<void> | null = null;
-/** Decode the three envelope states once (also called from WhatsApp, C0). */
+/** Decode the envelope's layers once (also called from WhatsApp, C0). */
 export function preloadOpening(): Promise<void> {
   if (typeof window === "undefined") return Promise.resolve();
   if (!decoded) {
     decoded = Promise.all(
-      [envelopeSealed, envelopeOpened, envelopeHero].map((src) => {
+      ENVELOPE_PARTS.map((src) => {
         const img = new Image();
         img.src = src;
         return img.decode().catch(() => undefined);
@@ -170,8 +170,8 @@ export function useOpening({
 
 /* ───────────────────────── Envelope hero ───────────────────────── */
 
-/** Envelope size while sealed, relative to the 80px hero slot (~206px wide). */
-const SEALED_SCALE = 2.4;
+/** Envelope size while sealed, relative to its size in the hero slot (~206px wide). */
+const SEALED_SCALE = 2.6;
 /** Figma −8° (counter-clockwise positive) = CSS +8°: the art reads almost level. */
 const SEALED_TILT = 8;
 /** Sparks thrown when the seal pops (angle°, distance px at slot scale). */
@@ -264,11 +264,6 @@ export function EnvelopeHero({
             filter: "blur(0px)",
             transition: { duration: 0.95 * k, ease: EASE_GLIDE },
           };
-
-  const fade = (on: boolean, d: number, delay = 0): TargetAndTransition => ({
-    opacity: on ? 1 : 0,
-    transition: { duration: d * k, delay: delay * k, ease: "easeInOut" },
-  });
 
   const ready = dy !== null;
   const initialWrap = play ? hidden : false;
@@ -369,43 +364,8 @@ export function EnvelopeHero({
                 );
               })}
             <div data-anno="haptic" className="absolute inset-0">
-              {play && (
-                <>
-                  <motion.img
-                    src={envelopeSealed}
-                    alt=""
-                    draggable={false}
-                    className="absolute left-[13px] top-[10.3px] w-[86px] max-w-none select-none"
-                    initial={{ opacity: 1 }}
-                    animate={fade(!at("pop"), 0.22, 0.04)}
-                  />
-                  <motion.img
-                    src={envelopeOpened}
-                    alt=""
-                    draggable={false}
-                    className="absolute left-[17px] top-[-16.5px] w-[78px] max-w-none select-none"
-                    initial={{ opacity: 0 }}
-                    animate={
-                      at("glide")
-                        ? fade(false, 0.5, 0.4)
-                        : fade(at("pop"), 0.22)
-                    }
-                  />
-                </>
-              )}
-              {/* Final hero: envelope.webp, CROP 0.68 at (0.149, 0.127) in 80×80. */}
-              <motion.div
-                className="absolute left-4 top-[2px] size-20 overflow-hidden"
-                initial={play ? { opacity: 0 } : false}
-                animate={fade(at("glide"), 0.5, 0.4)}
-              >
-                <img
-                  src={envelopeHero}
-                  alt="An opened glass envelope with a violet seal"
-                  draggable={false}
-                  className="absolute left-[-17.53px] top-[-14.94px] w-[117.65px] max-w-none select-none"
-                />
-              </motion.div>
+              {/* Sealed until the pop, then it opens: seal off, flap up, note out, heart. */}
+              <OpeningEnvelope open={at("pop")} instant={!play} speed={k} />
             </div>
           </motion.div>
         </motion.div>

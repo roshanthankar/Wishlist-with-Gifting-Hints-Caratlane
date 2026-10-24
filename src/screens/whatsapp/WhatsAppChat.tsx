@@ -6,8 +6,7 @@ import type { FrameAnnotations } from '@/proto/annotations'
 import { useNav } from '@/proto/nav'
 import { useProtoState } from '@/proto/store'
 import { haptic } from '@/proto/haptics'
-import { Screen } from '@/ui'
-import envelope from '@/assets/illustrations/envelope.webp'
+import { PreviewEnvelope, Screen } from '@/ui'
 import { preloadOpening } from '../hint-page/OpeningMotion'
 
 /**
@@ -107,15 +106,8 @@ export default function WhatsAppChat({ frame: _frame }: { frame: FrameId }) {
                       className="relative h-[150px] w-full overflow-hidden"
                       style={{ background: 'linear-gradient(90deg, #e4dcff 0%, #d6e4ff 55%, #d2faff 100%)' }}
                     >
-                      {/* Envelope: CROP 0.68 at (0.149, 0.127) in a 96px box, 28 from the top. */}
-                      <div className="absolute left-1/2 top-7 size-24 -translate-x-1/2 overflow-hidden">
-                        <img
-                          src={envelope}
-                          alt=""
-                          draggable={false}
-                          className="absolute left-[-21.04px] top-[-17.93px] w-[141.18px] max-w-none select-none"
-                        />
-                      </div>
+                      {/* The sealed envelope, animated: it knocks and hearts rise from behind it. */}
+                      <PreviewEnvelope width={112} className="absolute left-1/2 top-[18px] -translate-x-1/2" />
                     </div>
                     <div className="flex flex-col gap-1 px-[10px] pb-[10px] pt-2">
                       <p className="text-[14px] font-semibold leading-[17px] text-black">Priya dropped you a hint</p>
@@ -207,7 +199,7 @@ export const annotations: FrameAnnotations = {
     {
       id: 'link-preview',
       title: 'Rich link preview',
-      body: 'Envelope art, “Priya dropped you a hint” and what’s inside, from the page’s Open Graph tags. Tapping it opens the hint.',
+      body: 'Envelope art, “Priya dropped you a hint” and what’s inside, from the page’s Open Graph tags. The envelope stays sealed: it knocks and glass hearts rise from behind it, and the seal only pops when Rahul opens the hint. Tapping it opens the hint.',
     },
     {
       id: 'message',

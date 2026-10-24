@@ -480,7 +480,7 @@ export const annotations: FrameAnnotations = {
     {
       id: 'hero-art',
       title: 'The envelope opens',
-      body: 'The glass envelope Priya sealed in the app opens here. On first open it floats in, breathes, pops its seal and glides into place, then her note and picks follow, about four seconds in all, so the page feels like a gift, not a landing page. A tap skips it.',
+      body: 'The glass envelope Priya sealed in the app opens here. On first open it floats in and breathes, then the seal pops off, the flap swings open, her note rises out under a glass heart, and it glides into place before her note and picks follow, about five seconds in all, so the page feels like a gift, not a landing page. A tap skips it.',
     },
     {
       id: 'her-note',

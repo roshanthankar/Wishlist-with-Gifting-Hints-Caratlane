@@ -77,7 +77,15 @@ The URL updates as you click through, so you can copy the address bar at any mom
 - **Gestures:** swipe from the left edge of the phone to go back, like iOS.
 - **Phones:** the small round button (drag it anywhere) opens flows, notes, annotations and next/previous.
 - **Liquid Glass:** buttons, bars, badges, the long-press menu and the toast are glass. In Chrome and Edge (and Chrome on Android) the glass also refracts what is behind it at the edges, like iOS; Safari and Firefox show the same glass without the bending. Press and hold a round glass button and it swells into a clear lens.
-- **Gifting Hints banner (A1):** where “Gifting-ready” sat, a hot-pink banner sells the feature in an 8-second loop: “Gifting Hints” punches in over a sunburst with confetti, then it settles while the three steps play, one pink frosted-glass icon each, with no repeats (save it for them: heart; they drop a hint: sealed envelope; gift it right: gift box). It is animated in Figma with Figma Motion (section “A1 · Gifting Hints banner (motion)”), exported at 4× and encoded as a 3× animated WebP (`src/assets/pdp/gifting-hints.webp`, 1110 × 450, 30 fps); a 3× still from the Figma component shows for reduced motion, off screen and while it loads. Tap it to start “Who is this for?”. Two other explored versions are kept, unshipped, in `docs/explorations/gifting-hints-banners/`.
+- **Gifting Hints banner (A1):** where “Gifting-ready” sat, a hot-pink banner sells the feature in an 8-second loop: “Gifting Hints” punches in over a sunburst with confetti, then it settles while the three steps play, one pink frosted-glass icon each, with no repeats (save it for them: heart; they drop a hint: sealed envelope; gift it right: gift box). It is animated in Figma with Figma Motion (section “A1 · Gifting Hints banner (motion)”), exported at 4× and encoded as a 3× H.264 video (`src/assets/pdp/gifting-hints.mp4`, 1110 × 450, 30 fps, 1.6 MB) so it plays smoothly in Safari too. It autoplays muted, loops, and pauses off screen or under a sheet; a 3× still from the Figma component is its poster and shows for reduced motion. Tap it to start “Who is this for?”. Two other explored versions are kept, unshipped, in `docs/explorations/gifting-hints-banners/`.
+- **Glass envelope motion:** the envelope is cut into layers (body, flap, seal, plus an hourglass, a padlock and a heart), so each state tells its own short story. All of them loop unless noted, and show the still art with reduced motion.
+  - **A9** (after Ananya votes): a note writes itself, slips in, the flap folds shut, the seal stamps down and the envelope flies off.
+  - **B4** Your hint is out: it floats and knocks now and then, with rings from the seal, like an unread message.
+  - **B4b** Rahul opened your hint: it flies in, the seal pops, the flap opens, the note rises and a glass heart pops up.
+  - **B6** Not opened yet: the hourglass drains and turns over beside the sealed envelope.
+  - **C0** WhatsApp preview: the sealed envelope knocks and hearts rise from behind it.
+  - **C1** The hint lands (once): the large envelope opens the same way as B4b, then glides into place.
+  - **E1** Link closed: a padlock drops on and clicks shut (once), then rattles now and then.
 - **Product page (A1–A4c):** the whole CaratLane product page scrolls, as in Figma (A1 is a scrolling frame there): after the price and the Gifting Hints banner come metal and ring size (tap a size to see its circumference), delivery and services, a video call, CaratLane Assurance, why you’ll love it, details with a size guide, what’s in the box, reviews, You may also like and Recently viewed. Review copy and counts are illustrative.
 - **3D ring (A1):** the Vanki on the product page turns on its own like a showroom turntable; drag it to any angle and it eases back into its spin. The first time the page is seen, a fingertip swipes across it to show it can be handled.
 - **QR hint card (B3b):** when the screen opens, the card flips twice (CaratLane on the back, then the QR again) so it reads as something to play with, then it sways slowly while the QR’s gradient flows; it stops swaying while you handle it. Move the cursor over the card and it leans toward it; tap it to flip it. On a phone it tilts with the phone itself, and the QR gradient, the light on the card and the colour behind it move with it. iPhones ask for motion access the first time the card is tapped, which needs the HTTPS link that GitHub Pages provides.
@@ -153,8 +161,10 @@ caratlane-prototype/
    │                          Screen, NavBar, Button, GlassCircle, Sheet, Chip, Toggle, ProductTile,
    │                          GiftListCard, SelectTile, OccasionPill, SafariBar, WebHeader, Logo…
    │                          liquidGlass.ts: the edge refraction behind every glass surface
+   │                          envelope/: the layered glass-envelope animations (A9, B4, B4b, B6, C0, C1, E1)
    ├─ data/                   products and the case-study copy
    ├─ assets/                 product photos, glass illustrations, patterns (exported from Figma),
+   │                          illustrations/envelope-parts/ the envelope, flap, seal, hourglass, padlock and heart layers,
    │                          brand/ CaratLane’s logo (from caratlane.com): web headers and the QR card’s back
    └─ screens/                one folder per screen (“route”); each renders several Figma frames
       ├─ registry.ts          route → component, and all annotations

@@ -1,15 +1,15 @@
-import { useRef } from 'react'
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
+import { useRef, type ReactNode } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
 import { WhatsappLogo } from '@phosphor-icons/react'
 import type { FrameId } from '@/proto/frames'
 import type { FrameAnnotations } from '@/proto/annotations'
 import { useNav } from '@/proto/nav'
 import { haptic } from '@/proto/haptics'
 import { useProtoState } from '@/proto/store'
-import { BottomBar, Button, LatticePageAura, ListGroup, NavBar, Screen, ScrollView, SectionLabel, Sheet, ToggleRow } from '@/ui'
-import envelopeSent from '@/assets/illustrations/envelope-sent.webp'
-import envelopeOpened from '@/assets/illustrations/envelope-opened.webp'
-import envelopeWaiting from '@/assets/illustrations/envelope-waiting.webp'
+import {
+  BottomBar, Button, HourglassEnvelope, LatticePageAura, ListGroup, NavBar, OpenedEnvelope, Screen, ScrollView, SectionLabel, Sheet, ToggleRow,
+  WaitingEnvelope,
+} from '@/ui'
 import { FadeText, RowCaption } from '../wishlist-priya/parts'
 import { HintStatusStep } from './HintStatusStep'
 import { EditPicks } from './EditPicksSheet'
@@ -17,7 +17,7 @@ import { EditPicks } from './EditPicksSheet'
 export const annotations: FrameAnnotations = {
   B4: [
     { id: 'hs-nav', title: 'Your hint', body: 'A status page Priya can come back to; back returns to the wishlist where the hint started.' },
-    { id: 'hs-hero', title: 'Envelope, in flight', body: 'The sent envelope floats gently: the hint is out and nothing is needed from Priya right now.' },
+    { id: 'hs-hero', title: 'Out, waiting to be opened', body: 'The sealed envelope floats, and every few seconds it knocks while soft rings pulse from the seal, like an unread message. The hint is out; nothing is needed from Priya.' },
     { id: 'hs-title', title: 'Your hint is out', body: 'Who it went to, on which app and when, in one line Priya can trust.' },
     { id: 'hs-sent', title: 'Sent', body: 'The tracker shows what Priya should know: sent, then opened.' },
     { id: 'hs-opened', title: 'Opened, next', body: 'An honest promise: we’ll tell Priya when Rahul opens it, nothing more.' },
@@ -27,7 +27,7 @@ export const annotations: FrameAnnotations = {
     { id: 'hs-done', title: 'Done', body: 'Back to the wishlist. The status stays one tap away.' },
   ],
   B4b: [
-    { id: 'hs-hero', title: 'Opened envelope', body: 'The illustration swaps in place, so the change of state is felt before it’s read.' },
+    { id: 'hs-hero', title: 'Opened, played out', body: 'The envelope arrives, the seal pops, the flap opens and the note rises out under a heart, so the change of state is felt before it’s read.' },
     { id: 'hs-title', title: 'Rahul opened your hint', body: 'The headline news, with when and where it was opened.' },
     { id: 'hs-sent', title: 'Sent to Rahul and Mom', body: 'Mom was added from “Send to more”; the step lists everyone who has the link.' },
     { id: 'hs-opened', title: 'Opened by Rahul', body: 'The step fills and its check pops the moment Rahul opens the link. Mom’s opens stay private.' },
@@ -46,7 +46,7 @@ export const annotations: FrameAnnotations = {
     { id: 'b5-footnote', title: 'Nothing new is sent', body: 'The footnote says exactly what happens: same link, no new message to Rahul.' },
   ],
   B6: [
-    { id: 'hs-hero', title: 'Still waiting', body: 'The envelope with an hourglass says “not yet” without sounding like a problem.' },
+    { id: 'hs-hero', title: 'Still waiting', body: 'The hourglass runs and turns over beside the sealed envelope: “not yet”, without sounding like a problem.' },
     { id: 'hs-title', title: 'Not opened yet', body: 'Puts the wait in context: seven days to the anniversary, still time.' },
     { id: 'hs-opened', title: 'Still waiting · Tue 18 Nov', body: 'The opened step stays empty and dated, so Priya knows the tracker is live.' },
     { id: 'hs-holds', title: 'Holds stay a surprise', body: 'Even now, nothing about what’s bought reaches Priya.' },
@@ -59,10 +59,11 @@ export const annotations: FrameAnnotations = {
 
 type Base = 'sent' | 'opened' | 'waiting'
 
-const HERO: Record<Base, { src: string; w: number; h: number; alt: string }> = {
-  sent: { src: envelopeSent, w: 133, h: 98, alt: 'A glass envelope, sealed and sent' },
-  opened: { src: envelopeOpened, w: 101, h: 115, alt: 'An opened glass envelope with a heart' },
-  waiting: { src: envelopeWaiting, w: 137, h: 95, alt: 'A sealed envelope beside an hourglass' },
+/** Each state's hero, animated, at its Figma width. */
+const HERO: Record<Base, { art: ReactNode; alt: string }> = {
+  sent: { art: <WaitingEnvelope width={133} />, alt: 'A sealed glass envelope, waiting to be opened' },
+  opened: { art: <OpenedEnvelope width={124} />, alt: 'A glass envelope opens and the note rises out, with a heart' },
+  waiting: { art: <HourglassEnvelope width={137} />, alt: 'A sealed envelope beside a running hourglass' },
 }
 
 const COPY: Record<Base, { title: string; sub: string }> = {
@@ -236,34 +237,28 @@ export default function HintStatus({ frame }: { frame: FrameId }) {
 }
 
 /**
- * Hero art slot (DS 834:79347): 160×120, each illustration at its Figma size
- * (FIT) so titles line up. Swaps with a cross-fade and scale; floats gently.
+ * Hero art slot (DS 834:79347): 160×120 so titles line up. Each state plays
+ * its own loop: sent waits to be opened (B4), opened shows the envelope
+ * arriving and opening (B4b), not opened runs an hourglass (B6). States swap
+ * with a cross-fade and scale.
  */
 function HeroSlot({ base }: { base: Base }) {
-  const reduce = useReducedMotion()
-  const art = HERO[base]
+  const hero = HERO[base]
   return (
-    <motion.div
-      data-anno="hs-hero"
-      className="relative h-[120px] w-[160px]"
-      animate={reduce ? undefined : { y: [0, -5, 0] }}
-      transition={{ duration: 4.2, ease: 'easeInOut', repeat: Infinity }}
-    >
+    <div data-anno="hs-hero" role="img" aria-label={hero.alt} className="relative h-[120px] w-[160px]">
       <AnimatePresence initial={false}>
-        <motion.img
+        <motion.div
           key={base}
-          src={art.src}
-          alt={art.alt}
-          draggable={false}
-          className="absolute left-1/2 top-1/2 max-w-none select-none"
-          style={{ width: art.w, height: art.h, marginLeft: -art.w / 2, marginTop: -art.h / 2 }}
+          className="absolute inset-0"
           initial={{ opacity: 0, scale: 0.82 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 1.12 }}
           transition={{ type: 'spring', stiffness: 260, damping: 24, opacity: { duration: 0.3 } }}
-        />
+        >
+          {hero.art}
+        </motion.div>
       </AnimatePresence>
-    </motion.div>
+    </div>
   )
 }
 

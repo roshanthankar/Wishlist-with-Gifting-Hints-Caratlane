@@ -15,3 +15,4 @@ export { ProductTile, TileTag, SavedHeart, GiftListCard, CreateListCard, FindMor
 export { AuraBlob, PinkPageAura, PinkSheetAura, VioletSheetAura, LatticePageAura, PATTERNS } from './Backdrops'
 export { Logo, WebHeader, SafariBar, BottomFade, useSafariInset } from './web'
 export { OccasionPill, PrivacyFootnote, LuLock, HeroArt, Avatar, Card, Toast, SavedToast } from './misc'
+export { SendingEnvelope, WaitingEnvelope, OpenedEnvelope, HourglassEnvelope, LockedEnvelope, OpeningEnvelope, PreviewEnvelope, ENVELOPE_PARTS } from './envelope'

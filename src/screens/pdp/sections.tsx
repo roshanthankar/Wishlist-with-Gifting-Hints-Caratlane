@@ -117,7 +117,10 @@ export function Customise() {
             Find my size
           </span>
         </div>
-        <div ref={rail} role="radiogroup" aria-label="Ring size" className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4" data-anno="ring-size">
+        {/* A scroller clips both axes, so 2px of vertical slack (cancelled by
+            the negative margin) keeps the chips' 1px borders whole when the
+            mockup scales to a fractional size; Safari shaved them otherwise. */}
+        <div ref={rail} role="radiogroup" aria-label="Ring size" className="no-scrollbar -mx-4 -my-[2px] flex gap-2 overflow-x-auto px-4 py-[2px]" data-anno="ring-size">
           {SIZES.map(([s]) => (
             <Chip key={s} on={s === size} onClick={() => setSize(s)} className="w-12">
               <span data-size={s}>{s}</span>

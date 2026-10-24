@@ -14,7 +14,7 @@ const price: Annotation = {
 const giftingBanner: Annotation = {
   id: 'gifting-hints',
   title: 'Gifting Hints, said loudly',
-  body: 'Where “Gifting-ready” sat, a banner in the same hot-pink language sells the feature in 8 seconds: “Gifting Hints” punches in with confetti, then it settles while the three steps play: save it for them, they drop a hint, gift it right. Animated in Figma with Figma Motion and played as a 3× animated WebP, so it stays sharp on any phone; the still shows for reduced motion. Tap to start “Who is this for?”.',
+  body: 'Where “Gifting-ready” sat, a banner in the same hot-pink language sells the feature in 8 seconds: “Gifting Hints” punches in with confetti, then it settles while the three steps play: save it for them, they drop a hint, gift it right. Animated in Figma with Figma Motion and played as a 3× video, so it stays sharp and smooth on any phone, Safari included; the still shows for reduced motion. Tap to start “Who is this for?”.',
 }
 const seeLive: Annotation = {
   id: 'see-live',

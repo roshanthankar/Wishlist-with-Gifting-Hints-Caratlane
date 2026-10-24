@@ -4,5 +4,3 @@ dist
 *.log
 .figma-staging
 .vite
-design-refs
-tsconfig.tsbuildinfo
