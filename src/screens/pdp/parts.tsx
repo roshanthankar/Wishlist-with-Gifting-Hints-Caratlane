@@ -32,7 +32,7 @@ function PhotoBadge({ children, className }: { children: ReactNode; className?: 
 function StarDot({ bg, ring }: { bg: string; ring: string }) {
   return (
     <span className="flex size-3 shrink-0 items-center justify-center rounded-full" style={{ background: bg, boxShadow: `0 0 0 1px ${ring}` }}>
-      <Star size={7} weight="fill" color="#fff" />
+      <Star size={7} weight="fill" color="#fff" style={{ transform: 'translateY(-0.5px)' }} />
     </span>
   )
 }
