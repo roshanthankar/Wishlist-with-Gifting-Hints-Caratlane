@@ -3,17 +3,23 @@ import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import {
   ArrowUUpLeft,
   ArrowsCounterClockwise,
+  Bell,
   CaretDown,
   CaretRight,
   Certificate,
+  ChatCircleText,
   CheckCircle,
+  Coins,
   Hand,
+  Phone,
   Ruler,
+  Sliders,
   ShieldCheck,
   Star,
   Storefront,
   Truck,
   VideoCamera,
+  WhatsappLogo,
 } from '@phosphor-icons/react'
 import { PRODUCTS, type ProductId } from '@/data/products'
 import { useProtoState } from '@/proto/store'
@@ -128,6 +134,43 @@ export function Customise() {
           ))}
         </div>
       </div>
+      <button type="button" className={cn(CARD, 'flex items-center gap-3 px-[14px] py-3 text-left')} data-anno="customise-settings">
+        <span className="flex shrink-0 rounded-full bg-violet-tint p-[8px]">
+          <Sliders size={18} color="#5a39e3" />
+        </span>
+        <span className="flex min-w-0 flex-1 flex-col gap-[3px] leading-[normal]">
+          <span className="text-[14px] font-semibold text-ink-2">Customise settings</span>
+          <span className="text-[12px] leading-4 text-muted">Engraving, stone choice and finish</span>
+        </span>
+        <CaretRight size={16} color="#9a9a9a" className="shrink-0" />
+      </button>
+    </div>
+  )
+}
+
+/* ───────────────────────── Contact us for assistance ───────────────────────── */
+
+export function ContactUs() {
+  const actions: [ReactNode, string, string][] = [
+    [<ChatCircleText size={22} color="#5a39e3" weight="fill" />, 'Chat', 'Reply in minutes'],
+    [<WhatsappLogo size={22} color="#00b845" weight="fill" />, 'WhatsApp', 'Message us'],
+    [<Phone size={22} color="#dd1564" weight="fill" />, 'Call', '1800-102-0103'],
+  ]
+  return (
+    <div className="flex flex-col gap-3 px-4" data-anno="contact-us">
+      <SectionTitle>Contact us for assistance</SectionTitle>
+      <div className={cn(CARD, 'flex')}>
+        {actions.map(([icon, label, sub], i) => (
+          <div key={label} className="flex min-w-0 flex-1">
+            {i > 0 && <div className="w-px bg-[#f1f1f1]" />}
+            <button type="button" className="flex min-w-0 flex-1 flex-col items-center gap-[6px] px-2 py-[14px] text-center leading-[normal]">
+              {icon}
+              <span className="text-[13px] font-semibold text-ink-2">{label}</span>
+              <span className="text-[11px] text-muted">{sub}</span>
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
@@ -215,6 +258,43 @@ export function Assurance() {
   )
 }
 
+/* ───────────────────────── xClusive points row ───────────────────────── */
+
+export function XClusivePoints() {
+  return (
+    <div className="px-4" data-anno="xclusive">
+      <div className={cn(CARD, 'flex items-center gap-[8px] px-3 py-[10px]')}>
+        <Coins size={16} weight="fill" color="#b85200" />
+        <span className="text-[12px] leading-[14px] text-ink-3">
+          Earn <span className="font-semibold text-orange">74 xClusive points</span> on prepaid orders online
+        </span>
+      </div>
+    </div>
+  )
+}
+
+/* ───────────────────────── Notify when price drops ───────────────────────── */
+
+export function NotifyPriceDrop() {
+  return (
+    <div className="px-4" data-anno="price-drop">
+      <button
+        type="button"
+        className={cn(CARD, 'flex w-full items-center gap-3 px-[14px] py-3 text-left')}
+      >
+        <span className="flex shrink-0 rounded-full bg-violet-tint p-[8px]">
+          <Bell size={18} color="#5a39e3" weight="fill" />
+        </span>
+        <span className="flex min-w-0 flex-1 flex-col gap-[3px] leading-[normal]">
+          <span className="text-[14px] font-semibold text-ink-2">Notify me when price drops</span>
+          <span className="text-[12px] leading-4 text-muted">We’ll ping you the moment this ring gets cheaper</span>
+        </span>
+        <span className="flex h-8 shrink-0 items-center rounded-full bg-violet-tint px-[14px] text-[13px] font-semibold leading-none text-violet">Notify me</span>
+      </button>
+    </div>
+  )
+}
+
 /* ───────────────────────── Why you’ll love this ───────────────────────── */
 
 export function WhyLoveIt() {
@@ -273,9 +353,11 @@ const SPECS: [string, string][] = [
   ['Certification', 'BIS Hallmark'],
 ]
 
+type DetailKey = 'details' | 'size' | 'care' | 'price' | null
+
 export function ProductDetails() {
-  const [open, setOpen] = useState<'details' | 'size' | 'care' | null>('details')
-  const toggle = (k: 'details' | 'size' | 'care') => setOpen((o) => (o === k ? null : k))
+  const [open, setOpen] = useProtoState<DetailKey>('pdp.details', 'details')
+  const toggle = (k: Exclude<DetailKey, null>) => setOpen((o) => (o === k ? null : k))
   return (
     <div className="px-4">
       <div className={cn(CARD, 'flex flex-col')} data-anno="details">
@@ -294,7 +376,15 @@ export function ProductDetails() {
           </dl>
         </Expand>
 
-        <AccordionRow title="Price breakup" sub="Gold, making charges and GST" />
+        <AccordionRow id="pdp-price-breakup" title="Price breakup" sub="Gold, making charges and GST" open={open === 'price'} onToggle={() => toggle('price')}>
+          <dl className="flex flex-col gap-[10px] px-[14px] pb-[14px] text-[13px] leading-4">
+            <BreakupRow label="9KT Yellow Gold" sub="1.886 g · ₹3,992/g" value="₹7,528" />
+            <BreakupRow label="Making Charges" sub="25% off applied" value="₹1,920" />
+            <BreakupRow label="GST" sub="3% on jewellery" value="₹284" />
+            <div className="h-px bg-[#ececef]" />
+            <BreakupRow label="Grand Total" value="₹9,732" bold />
+          </dl>
+        </AccordionRow>
         <AccordionRow title="Size guide" sub="All sizes from 5 to 24 · 44.8–63.8 mm" open={open === 'size'} onToggle={() => toggle('size')}>
           <div className="grid grid-cols-4 gap-x-2 gap-y-[6px] px-[14px] pb-[14px] text-[12px] leading-4">
             {SIZES.map(([s, c]) => (
@@ -316,12 +406,13 @@ export function ProductDetails() {
 }
 
 /** A collapsed row; without `onToggle` it has no tap (nothing to open in the prototype). */
-function AccordionRow({ title, sub, open = false, onToggle, children }: { title: string; sub: string; open?: boolean; onToggle?: () => void; children?: ReactNode }) {
+function AccordionRow({ id, title, sub, open = false, onToggle, children }: { id?: string; title: string; sub: string; open?: boolean; onToggle?: () => void; children?: ReactNode }) {
   return (
     <>
       <div className="h-px bg-[#f1f1f1]" />
       <button
         type="button"
+        id={id}
         aria-expanded={onToggle ? open : undefined}
         onClick={onToggle}
         className={cn('flex items-center gap-3 px-[14px] py-3 text-left', !onToggle && 'pointer-events-none')}
@@ -334,6 +425,18 @@ function AccordionRow({ title, sub, open = false, onToggle, children }: { title:
       </button>
       {children && <Expand open={open}>{children}</Expand>}
     </>
+  )
+}
+
+function BreakupRow({ label, sub, value, bold }: { label: string; sub?: string; value: string; bold?: boolean }) {
+  return (
+    <div className="flex items-start gap-3">
+      <div className="flex min-w-0 flex-1 flex-col gap-[2px] leading-4">
+        <span className={bold ? 'text-[14px] font-semibold text-ink-2' : 'text-[13px] font-medium text-ink-2'}>{label}</span>
+        {sub && <span className="text-[11px] text-muted">{sub}</span>}
+      </div>
+      <span className={cn('shrink-0 tabular', bold ? 'text-[14px] font-bold text-black' : 'text-[13px] font-semibold text-ink-2')}>{value}</span>
+    </div>
   )
 }
 

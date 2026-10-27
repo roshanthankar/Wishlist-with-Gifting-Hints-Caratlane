@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react'
 import { AnimatePresence, motion, useAnimate, useReducedMotion } from 'motion/react'
 import { ArrowsClockwise, CaretDown, CaretRight, GpsFix, Heart, SealPercent, Star } from '@phosphor-icons/react'
-import { getProto, setProto } from '@/proto/store'
+import { getProto, setProto, useProtoState } from '@/proto/store'
 import { GlassCircle, ProductPhoto } from '@/ui'
 import type { ProductId } from '@/data/products'
 import type { Nudge } from './Ring3D'
@@ -191,7 +191,7 @@ export function MediaCarousel({ saved, onHeart, active = true }: { saved: boolea
     <div className="relative" data-anno="media">
       <div className="no-scrollbar flex snap-x snap-mandatory scroll-px-4 gap-2 overflow-x-auto overscroll-x-contain px-4">
         <Ring3DSlide active={active} />
-        <Photo id="petite-cluster" label="Next photo" />
+        <Photo id="vanki" label="Next photo" />
         <span aria-hidden className="w-2 shrink-0" />
       </div>
       <div className="pointer-events-none absolute inset-y-0 left-4 right-4">
@@ -255,14 +255,21 @@ export function MediaCarousel({ saved, onHeart, active = true }: { saved: boolea
 /* ───────────────────────── Price block ───────────────────────── */
 
 export function PriceBlock() {
+  const [, setDetails] = useProtoState<'details' | 'size' | 'care' | 'price' | null>('pdp.details', 'details')
+  const openBreakup = () => {
+    setDetails('price')
+    requestAnimationFrame(() => {
+      document.getElementById('pdp-price-breakup')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    })
+  }
   return (
     <div className="flex flex-col gap-[10px] px-4" data-anno="price">
       <div className="flex items-center justify-between">
         <div className="flex min-w-0 flex-1 flex-col gap-3">
-          <div className="flex items-center gap-[2px] self-start">
+          <button type="button" onClick={openBreakup} className="flex items-center gap-[2px] self-start">
             <span className="text-[12px] font-semibold leading-3 text-ink-3">View Price Breakup</span>
             <CaretDown size={12} color="#000" />
-          </div>
+          </button>
           <div className="flex flex-col gap-2">
             <div className="flex h-6 items-center gap-[10px] whitespace-nowrap leading-[normal]">
               <p className="flex items-center gap-[2px] text-[24px] text-black">

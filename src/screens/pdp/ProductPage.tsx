@@ -8,7 +8,7 @@ import { useProtoState } from '@/proto/store'
 import { haptic } from '@/proto/haptics'
 import { FIGMA_LEADING, MediaCarousel, PriceBlock } from './parts'
 import { GiftingHints } from './GiftingHints'
-import { AlsoLike, Assurance, Customise, DeliveryServices, InTheBox, ProductDetails, RecentlyViewed, Reviews, SeeItLiveCard, WhyLoveIt } from './sections'
+import { AlsoLike, Assurance, ContactUs, Customise, DeliveryServices, InTheBox, NotifyPriceDrop, ProductDetails, RecentlyViewed, Reviews, SeeItLiveCard, WhyLoveIt, XClusivePoints } from './sections'
 import { GiftSheet } from './GiftSheet'
 import { PREFILL, PickPanel, WhoPanel, type Occasion, type PickVariant, type Relationship } from './panels'
 
@@ -99,9 +99,12 @@ export default function ProductPage({ frame }: { frame: FrameId }) {
           <DeliveryServices />
           <SeeItLiveCard />
           <Assurance />
+          <XClusivePoints />
           <WhyLoveIt />
           <ProductDetails />
           <InTheBox />
+          <ContactUs />
+          <NotifyPriceDrop />
           <Reviews />
           <AlsoLike />
           <RecentlyViewed />
