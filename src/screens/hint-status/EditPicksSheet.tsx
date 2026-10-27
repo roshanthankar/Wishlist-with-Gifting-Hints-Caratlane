@@ -26,11 +26,8 @@ export function EditPicks({ onClose, onUpdate }: { onClose: () => void; onUpdate
             right={
               <span className="flex items-center">
                 <span className="font-medium tabular">
-                  {picks.length} of {SAVED_COUNT} ·&nbsp;
+                  {picks.length} of {SAVED_COUNT}
                 </span>
-                <button type="button" className="pointer-events-none font-semibold text-violet">
-                  See all
-                </button>
               </span>
             }
           >

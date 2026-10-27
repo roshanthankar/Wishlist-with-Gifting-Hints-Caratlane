@@ -48,10 +48,7 @@ export function ComposeStep({ onClose, onNext }: { onClose: () => void; onNext: 
            
             right={
               <span data-anno="b2-count" className="flex items-center">
-                <span className="font-medium tabular">{picks.length} of {SAVED_COUNT} ·&nbsp;</span>
-                <button type="button" className="pointer-events-none font-semibold text-violet">
-                  See all
-                </button>
+                <span className="font-medium tabular">{picks.length} of {SAVED_COUNT}</span>
               </span>
             }
           >

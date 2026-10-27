@@ -8,11 +8,11 @@ import {
   Certificate,
   CheckCircle,
   Hand,
-  Lightning,
   Ruler,
   ShieldCheck,
   Star,
   Storefront,
+  Truck,
   VideoCamera,
 } from '@phosphor-icons/react'
 import { PRODUCTS, type ProductId } from '@/data/products'
@@ -149,7 +149,7 @@ function ServiceRow({ icon, title, sub }: { icon: ReactNode; title: string; sub:
 
 export function DeliveryServices() {
   const rows: [ReactNode, string, string][] = [
-    [<Lightning size={22} color="#3e3e3e" />, 'Express delivery', 'Same or next day in select cities'],
+    [<Truck size={22} color="#3e3e3e" />, 'Express delivery', 'Same or next day in select cities'],
     [<Storefront size={22} color="#3e3e3e" />, 'Pick up at a store near you', 'See it in person before you take it home'],
     [<Hand size={22} color="#3e3e3e" />, 'Try it at home', 'An expert brings it over, free in select cities'],
   ]

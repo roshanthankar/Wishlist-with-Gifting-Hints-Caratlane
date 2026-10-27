@@ -163,10 +163,10 @@ export function ToggleItem({
   'data-anno'?: string
 }) {
   return (
-    <div data-anno={anno} className="box-content flex h-[54px] items-center gap-3 px-[14px]">
-      <div className="flex min-w-0 flex-1 flex-col gap-1 leading-none">
+    <div data-anno={anno} className="box-content flex min-h-[54px] items-center gap-3 px-[14px] py-2">
+      <div className="flex min-w-0 flex-1 flex-col gap-1 leading-[1.3]">
         <p className="text-[14px] font-semibold text-black">{title}</p>
-        <p className="truncate text-[12px] text-muted">{caption}</p>
+        <p className="text-[12px] text-muted">{caption}</p>
       </div>
       <Toggle checked={checked} onChange={onChange} label={title} />
     </div>
